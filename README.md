@@ -396,16 +396,3 @@ Payload mínimo:
 - Aba IA para análise, ajustes de parser, severidade, evidências e resposta recomendada.
 - Documentos auxiliares em `docs/linkedin-post.md` e `docs/github-publish.md`.
 
-## Uso recomendado para apresentação
-
-- Use o modo claro para prints, LinkedIn e documentação.
-- Use o modo escuro para demonstração operacional estilo SOC.
-- Mostre o fluxo: Dashboard → Generate → Logs Gerados → Raw concentrado → Parser → IA.
-
-## Publicação no GitHub
-
-Consulte `docs/github-publish.md` para comandos de Git, descrição do repositório, tópicos e checklist de publicação.
-
-## Post para LinkedIn
-
-Consulte `docs/linkedin-post.md` para uma sugestão pronta de publicação sobre o projeto.
