@@ -12,23 +12,19 @@ Gerar datasets de logs sintéticos para treinamento e engenharia de detecção s
 
 ### Dashboard em modo escuro
 
-![Dashboard Dark](docs/screenshots/dashboard-dark.png)
+![Dashboard Dark](docs/screenshots/ai-log-v3-dashboard-dark.png)
 
 ### Dashboard em modo claro
 
-![Dashboard Light](docs/screenshots/dashboard-light.png)
-
-### Gerador de logs
-
-![Log Generator](docs/screenshots/log-generator.png)
+![Dashboard Light](docs/screenshots/ai-log-v3-dashboard-light.png)
 
 ### Logs gerados, Parser e Análise com IA
 
-![Logs Parser AI](docs/screenshots/logs-parser-ai.png)
+![Logs Parser AI](docs/screenshots/ai-log-v3-logs-parser-ai.png)
 
 ### Configurações de tema
 
-![Theme Settings](docs/screenshots/settings-theme.png)
+![Theme Settings](docs/screenshots/ai-log-v3-settings-light.png)
 
 ## Stack
 
