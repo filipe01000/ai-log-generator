@@ -8,6 +8,28 @@ O projeto substitui a ideia inicial em Shell Script por uma arquitetura web mode
 
 Gerar datasets de logs sintéticos para treinamento e engenharia de detecção sem usar dados reais sensíveis. O sistema mistura eventos benignos e maliciosos, inclui mapeamento MITRE ATT&CK e exporta em múltiplos formatos aceitos por fluxos de SOC/SIEM.
 
+## Screenshots
+
+### Dashboard em modo escuro
+
+![Dashboard Dark](docs/screenshots/ai-log-v4-dashboard-dark.png)
+
+### Dashboard em modo claro
+
+![Dashboard Light](docs/screenshots/ai-log-v4-dashboard-light.png)
+
+### Gerador de logs
+
+![Log Generator](docs/screenshots/ai-log-v4-generate.png)
+
+### Logs gerados, Raw concentrado, Parser e IA
+
+![Logs Raw Parser AI](docs/screenshots/ai-log-v4-logs-raw-parser-ai.png)
+
+### Configurações
+
+![Settings](docs/screenshots/ai-log-v4-settings.png)
+
 ## Stack
 
 ### Frontend
@@ -395,20 +417,6 @@ Payload mínimo:
 - Visualização Parser para campos normalizados.
 - Aba IA para análise, ajustes de parser, severidade, evidências e resposta recomendada.
 - Documentos auxiliares em `docs/linkedin-post.md` e `docs/github-publish.md`.
-
-## Uso recomendado para apresentação
-
-- Use o modo claro para prints, LinkedIn e documentação.
-- Use o modo escuro para demonstração operacional estilo SOC.
-- Mostre o fluxo: Dashboard → Generate → Logs Gerados → Raw concentrado → Parser → IA.
-
-## Publicação no GitHub
-
-Consulte `docs/github-publish.md` para comandos de Git, descrição do repositório, tópicos e checklist de publicação.
-
-## Post para LinkedIn
-
-Consulte `docs/linkedin-post.md` para uma sugestão pronta de publicação sobre o projeto.
 
 ## Novidades da versão 4
 
