@@ -8,6 +8,28 @@ O projeto substitui a ideia inicial em Shell Script por uma arquitetura web mode
 
 Gerar datasets de logs sintéticos para treinamento e engenharia de detecção sem usar dados reais sensíveis. O sistema mistura eventos benignos e maliciosos, inclui mapeamento MITRE ATT&CK e exporta em múltiplos formatos aceitos por fluxos de SOC/SIEM.
 
+## Screenshots
+
+### Dashboard em modo escuro
+
+![Dashboard Dark](docs/screenshots/dashboard-dark.png)
+
+### Dashboard em modo claro
+
+![Dashboard Light](docs/screenshots/dashboard-light.png)
+
+### Gerador de logs
+
+![Log Generator](docs/screenshots/log-generator.png)
+
+### Logs gerados, Parser e Análise com IA
+
+![Logs Parser AI](docs/screenshots/logs-parser-ai.png)
+
+### Configurações de tema
+
+![Theme Settings](docs/screenshots/settings-theme.png)
+
 ## Stack
 
 ### Frontend
@@ -395,4 +417,3 @@ Payload mínimo:
 - Visualização Parser para campos normalizados.
 - Aba IA para análise, ajustes de parser, severidade, evidências e resposta recomendada.
 - Documentos auxiliares em `docs/linkedin-post.md` e `docs/github-publish.md`.
-
