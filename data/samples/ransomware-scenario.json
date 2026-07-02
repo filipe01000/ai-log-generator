@@ -1,0 +1,12 @@
+{
+  "name": "Hospital - Ransomware - Sample",
+  "companyType": "Hospital",
+  "assetCount": 250,
+  "userCount": 1200,
+  "attackType": "Ransomware",
+  "durationHours": 12,
+  "noiseLevel": 35,
+  "severity": "critical",
+  "vendors": ["FortiGate", "Windows Security", "Sysmon", "Wazuh", "Microsoft Defender"],
+  "outputFormat": "ndjson"
+}

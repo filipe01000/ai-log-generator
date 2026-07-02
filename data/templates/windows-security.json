@@ -1,0 +1,20 @@
+[
+  {
+    "name": "windows_security_4624",
+    "vendor": "Windows Security",
+    "description": "Logon bem-sucedido com tipo de logon, origem, usuário e workstation.",
+    "event_id": 4624
+  },
+  {
+    "name": "windows_security_4625",
+    "vendor": "Windows Security",
+    "description": "Falha de autenticação para brute force, password spraying ou credenciais inválidas.",
+    "event_id": 4625
+  },
+  {
+    "name": "windows_security_4688",
+    "vendor": "Windows Security",
+    "description": "Criação de processo com command line para detecção de execução suspeita.",
+    "event_id": 4688
+  }
+]

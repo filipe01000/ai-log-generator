@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model GeneratedLog {
+  id              String    @id @default(cuid())
+  timestamp       DateTime
+  vendor          String
+  product         String?
+  eventType       String
+  severity        String
+  sourceIp        String?
+  destinationIp   String?
+  username        String?
+  hostname        String?
+  mitreId         String?
+  mitreTactic     String?
+  mitreTechnique  String?
+  riskScore       Int       @default(0)
+  confidence      Float     @default(0.8)
+  raw             String
+  jsonPayload     String    @default("{}")
+  scenarioId      String?
+  scenario        Scenario? @relation(fields: [scenarioId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+
+  @@index([vendor])
+  @@index([severity])
+  @@index([sourceIp])
+  @@index([destinationIp])
+  @@index([username])
+  @@index([mitreId])
+  @@map("generated_logs")
+}
+
+model Scenario {
+  id             String         @id @default(cuid())
+  name           String
+  companyType    String
+  assetCount     Int
+  userCount      Int
+  attackType     String
+  durationHours  Int
+  noiseLevel     Int
+  severity       String
+  vendors        String
+  outputFormat   String
+  summary        String
+  timelineJson   String         @default("[]")
+  iocJson        String         @default("[]")
+  ttpJson        String         @default("[]")
+  createdAt      DateTime       @default(now())
+  logs           GeneratedLog[]
+
+  @@index([attackType])
+  @@index([severity])
+  @@map("scenarios")
+}
+
+model Asset {
+  id          String   @id @default(cuid())
+  hostname    String   @unique
+  ipAddress   String
+  assetType   String
+  os          String?
+  criticality String   @default("medium")
+  owner       String?
+  createdAt   DateTime @default(now())
+
+  @@index([ipAddress])
+  @@map("assets")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  displayName String?
+  department  String?
+  role        String?
+  riskLevel   String   @default("medium")
+  createdAt   DateTime @default(now())
+
+  @@map("users")
+}
+
+model MitreTechnique {
+  id              String   @id
+  tactic          String
+  technique       String
+  subTechnique    String?
+  description     String
+  detection       String
+  recommendation  String
+  severity        String
+  confidence      Float
+  riskScore       Int
+  createdAt       DateTime @default(now())
+
+  @@index([tactic])
+  @@map("mitre_techniques")
+}
+
+model ExportJob {
+  id          String   @id @default(cuid())
+  format      String
+  filename    String
+  recordCount Int
+  filtersJson String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@map("exports")
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}

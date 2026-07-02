@@ -1,0 +1,12 @@
+[
+  {
+    "name": "aws_console_login",
+    "vendor": "AWS CloudTrail",
+    "description": "Login no console AWS com IP de origem, MFA, identidade e user agent."
+  },
+  {
+    "name": "aws_iam_policy_change",
+    "vendor": "AWS CloudTrail",
+    "description": "Alteração de IAM para cenários de privilege escalation e cloud persistence."
+  }
+]

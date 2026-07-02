@@ -1,0 +1,14 @@
+[
+  {
+    "name": "fortigate_ips_local_in",
+    "vendor": "FortiGate",
+    "description": "Evento IPS/local-in para exploração ou varredura contra interface exposta.",
+    "fields": ["date", "time", "devname", "srcip", "dstip", "dstport", "action", "attack", "severity", "mitreid"]
+  },
+  {
+    "name": "fortigate_traffic_forward",
+    "vendor": "FortiGate",
+    "description": "Tráfego forward com destino externo, útil para C2, DNS tunneling e exfiltração.",
+    "fields": ["srcip", "dstip", "srcintf", "dstintf", "policyid", "service", "app", "action", "sentbyte", "rcvdbyte"]
+  }
+]

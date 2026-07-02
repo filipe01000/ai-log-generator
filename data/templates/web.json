@@ -1,0 +1,12 @@
+[
+  {
+    "name": "apache_access_attack",
+    "vendor": "Apache",
+    "description": "Access log com payloads SQLi, XSS, traversal e web shell."
+  },
+  {
+    "name": "nginx_access_benign",
+    "vendor": "Nginx",
+    "description": "Ruído benigno de navegação, health check e APIs."
+  }
+]
