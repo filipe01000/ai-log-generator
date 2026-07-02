@@ -30,6 +30,10 @@ Gerar datasets de logs sintéticos para treinamento e engenharia de detecção s
 
 ![Settings](docs/screenshots/ai-log-v4-settings.png)
 
+### Configurações
+
+![Settings](docs/screenshots/ai-log-v4-settings.png)
+
 ## Stack
 
 ### Frontend
