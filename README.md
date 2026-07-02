@@ -8,24 +8,6 @@ O projeto substitui a ideia inicial em Shell Script por uma arquitetura web mode
 
 Gerar datasets de logs sintéticos para treinamento e engenharia de detecção sem usar dados reais sensíveis. O sistema mistura eventos benignos e maliciosos, inclui mapeamento MITRE ATT&CK e exporta em múltiplos formatos aceitos por fluxos de SOC/SIEM.
 
-## Screenshots
-
-### Dashboard em modo escuro
-
-![Dashboard Dark](docs/screenshots/ai-log-v3-dashboard-dark.png)
-
-### Dashboard em modo claro
-
-![Dashboard Light](docs/screenshots/ai-log-v3-dashboard-light.png)
-
-### Logs gerados, Parser e Análise com IA
-
-![Logs Parser AI](docs/screenshots/ai-log-v3-logs-parser-ai.png)
-
-### Configurações de tema
-
-![Theme Settings](docs/screenshots/ai-log-v3-settings-light.png)
-
 ## Stack
 
 ### Frontend
@@ -413,3 +395,63 @@ Payload mínimo:
 - Visualização Parser para campos normalizados.
 - Aba IA para análise, ajustes de parser, severidade, evidências e resposta recomendada.
 - Documentos auxiliares em `docs/linkedin-post.md` e `docs/github-publish.md`.
+
+## Uso recomendado para apresentação
+
+- Use o modo claro para prints, LinkedIn e documentação.
+- Use o modo escuro para demonstração operacional estilo SOC.
+- Mostre o fluxo: Dashboard → Generate → Logs Gerados → Raw concentrado → Parser → IA.
+
+## Publicação no GitHub
+
+Consulte `docs/github-publish.md` para comandos de Git, descrição do repositório, tópicos e checklist de publicação.
+
+## Post para LinkedIn
+
+Consulte `docs/linkedin-post.md` para uma sugestão pronta de publicação sobre o projeto.
+
+## Novidades da versão 4
+
+- Raw log com quebra de linha ativada por padrão, sem necessidade de rolar horizontalmente para copiar.
+- Botão de copiar por log individual no modo `Raw concentrado`.
+- Botão `Copiar tudo` mantido para copiar todos os logs filtrados.
+- Visualização raw da tabela ajustada para ficar dentro do enquadro da tela, no estilo console/SIEM.
+- Gráficos do dashboard com cores ajustadas para modo claro e modo escuro.
+- Remoção das áreas pretas padrão do Recharts em barras, labels e tooltip.
+- Botão `Excluir filtrados` para apagar somente os logs que batem com os filtros atuais.
+- Botão `Limpar todos` para apagar todos os logs sintéticos salvos no SQLite.
+- Endpoint `DELETE /api/logs` para limpeza controlada dos logs gerados.
+
+### Excluir logs gerados
+
+Excluir logs com filtros:
+
+```http
+DELETE /api/logs
+Content-Type: application/json
+```
+
+```json
+{
+  "scope": "filtered",
+  "filters": {
+    "vendor": "FortiGate",
+    "severity": "critical"
+  }
+}
+```
+
+Excluir todos os logs sintéticos:
+
+```http
+DELETE /api/logs
+Content-Type: application/json
+```
+
+```json
+{
+  "scope": "all"
+}
+```
+
+Por segurança, a exclusão filtrada exige pelo menos um filtro ativo. Para apagar tudo, é necessário usar explicitamente `scope: "all"`.

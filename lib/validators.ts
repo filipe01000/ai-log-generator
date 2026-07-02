@@ -48,6 +48,18 @@ export const logSearchSchema = z.object({
   skip: z.coerce.number().int().min(0).default(0)
 });
 
+export const deleteLogsSchema = z.object({
+  scope: z.enum(["all", "filtered"]).default("filtered"),
+  filters: z.object({
+    vendor: z.string().optional(),
+    severity: z.string().optional(),
+    ip: z.string().optional(),
+    username: z.string().optional(),
+    mitreId: z.string().optional(),
+    q: z.string().optional()
+  }).optional()
+});
+
 
 export const aiAnalysisSchema = z.object({
   provider: z.enum(["mock", "openai", "ollama"]).default("mock"),
@@ -73,4 +85,5 @@ export const aiAnalysisSchema = z.object({
 export type GenerateInput = z.infer<typeof generateSchema>;
 export type AiScenarioInput = z.infer<typeof aiScenarioSchema>;
 export type ExportInput = z.infer<typeof exportSchema>;
+export type DeleteLogsInput = z.infer<typeof deleteLogsSchema>;
 export type AiAnalysisInput = z.infer<typeof aiAnalysisSchema>;

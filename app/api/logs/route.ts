@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { GeneratedLog, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { logSearchSchema } from "@/lib/validators";
+import { deleteLogsSchema, logSearchSchema } from "@/lib/validators";
 import { sanitizeText } from "@/lib/security";
+import { getClientKey, rateLimit } from "@/lib/rate-limit";
 
 function buildWhere(input: Record<string, unknown>): Prisma.GeneratedLogWhereInput {
   const vendor = sanitizeText(input.vendor, 80);
@@ -32,6 +33,10 @@ function buildWhere(input: Record<string, unknown>): Prisma.GeneratedLogWhereInp
   return and.length ? { AND: and } : {};
 }
 
+function hasActiveFilter(input: Record<string, unknown>) {
+  return ["vendor", "severity", "ip", "username", "mitreId", "q"].some((key) => Boolean(sanitizeText(input[key], 200)));
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const raw = Object.fromEntries(url.searchParams.entries());
@@ -48,4 +53,24 @@ export async function GET(request: Request) {
     total,
     logs: logs.map((log: GeneratedLog) => ({ ...log, timestamp: log.timestamp.toISOString(), createdAt: log.createdAt.toISOString() }))
   });
+}
+
+export async function DELETE(request: Request) {
+  const limit = rateLimit(`delete-logs:${getClientKey(request)}`, 10, 60_000);
+  if (!limit.allowed) return NextResponse.json({ error: "Rate limit excedido. Aguarde alguns segundos." }, { status: 429 });
+
+  const body = await request.json().catch(() => null);
+  const parsed = deleteLogsSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: "Payload inválido", details: parsed.error.flatten() }, { status: 400 });
+
+  const filters = parsed.data.filters || {};
+
+  if (parsed.data.scope === "filtered" && !hasActiveFilter(filters)) {
+    return NextResponse.json({ error: "Para excluir filtrados, aplique pelo menos um filtro. Para apagar tudo, use scope=all." }, { status: 400 });
+  }
+
+  const where = parsed.data.scope === "all" ? {} : buildWhere(filters);
+  const result = await prisma.generatedLog.deleteMany({ where });
+
+  return NextResponse.json({ deleted: result.count, scope: parsed.data.scope });
 }
