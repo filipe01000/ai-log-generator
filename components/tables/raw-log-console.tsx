@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Copy, Rows3, WrapText } from "lucide-react";
+import { Check, Copy, Rows3, Search, WrapText, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,22 @@ export function RawLogConsole({ logs }: { logs: RawConsoleLog[] }) {
   }, [logs, query, groupMode]);
 
   const rawBlock = visibleLogs.map((log) => log.raw).join("\n");
+  const matchCount = useMemo(() => {
+    const q = query.trim();
+    if (!q) return 0;
+    return logs.reduce((total, log) => total + (log.raw.toLowerCase().split(q.toLowerCase()).length - 1), 0);
+  }, [logs, query]);
+
+  function highlightRaw(raw: string) {
+    const q = query.trim();
+    if (!q) return raw;
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return raw.split(new RegExp(`(${escaped})`, "gi")).map((part, index) =>
+      part.toLowerCase() === q.toLowerCase()
+        ? <mark key={index} className="rounded bg-yellow-300 px-0.5 text-black">{part}</mark>
+        : part
+    );
+  }
 
   async function copyAll() {
     await navigator.clipboard.writeText(rawBlock);
@@ -71,7 +87,14 @@ export function RawLogConsole({ logs }: { logs: RawConsoleLog[] }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-        <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar dentro do raw concentrado: ip, usuário, mitre, comando..." />
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input className="pl-9 pr-24" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Pesquisar no Raw Log: IP, usuário, MITRE, comando..." />
+          <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+            {query && <Badge variant="outline">{matchCount} ocorrência(s)</Badge>}
+            {query && <button type="button" onClick={() => setQuery("")} aria-label="Limpar pesquisa" className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"><X className="h-4 w-4" /></button>}
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={groupMode === "timeline" ? "default" : "outline"} onClick={() => setGroupMode("timeline")}>Timeline</Button>
           <Button size="sm" variant={groupMode === "vendor" ? "default" : "outline"} onClick={() => setGroupMode("vendor")}>Fabricante</Button>
@@ -108,7 +131,7 @@ export function RawLogConsole({ logs }: { logs: RawConsoleLog[] }) {
                   </Button>
                 </div>
                 <pre className={`${wrap ? "whitespace-pre-wrap break-words" : "overflow-x-auto whitespace-pre"} min-w-0 rounded-b-lg bg-background/70 px-3 py-3 text-foreground`}>
-                  {log.raw}
+                  {highlightRaw(log.raw)}
                 </pre>
               </article>
             ))}

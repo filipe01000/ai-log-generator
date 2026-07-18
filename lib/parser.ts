@@ -127,7 +127,7 @@ function parseWebAccess(raw: string) {
   return fields;
 }
 
-function parseZeek(raw: string) {
+function parseZeek(raw: string): Record<string, string> {
   const lines = raw.split(/\r?\n/).filter(Boolean);
   const dataLine = lines.find((line) => !line.startsWith("#"));
   if (!dataLine) return {};

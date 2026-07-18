@@ -16,6 +16,14 @@
 
 ![Logs Raw Parser AI](docs/screenshots/ai-log-v4-logs-raw-parser-ai.png)
 
+### Investigation Mode
+
+![Investigation Mode](docs/screenshots/ai-log-v2-investigation-mode.png)
+
+### Detection Engineering Lab
+
+![Detection Engineering Lab](docs/screenshots/ai-log-v2-detection-engineering-lab.png)
+
 ### Configurações
 
 ![Settings](docs/screenshots/ai-log-v4-settings.png)

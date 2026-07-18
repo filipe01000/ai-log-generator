@@ -1,6 +1,10 @@
 export const MANUFACTURERS = [
   "FortiGate",
   "FortiSIEM",
+  "FortiWeb",
+  "Trend Vision One",
+  "Microsoft IIS",
+  "VMware",
   "Wazuh",
   "Sysmon",
   "Windows Security",
@@ -31,6 +35,7 @@ export const MANUFACTURERS = [
 ] as const;
 
 export const EVENT_TYPES = [
+  "Rotina SOC N1 - Mix diário",
   "Logon",
   "Logoff",
   "Falha de autenticação",
@@ -72,8 +77,41 @@ export const EVENT_TYPES = [
   "Malware",
   "Botnet",
   "APT",
-  "Insider Threat"
+  "Insider Threat",
+  "FortiGate Traffic Forward",
+  "FortiGate App Control",
+  "FortiGate IPS",
+  "FortiGate Config Change",
+  "FortiWeb HTTPS",
+  "Windows 4624 - Logon bem-sucedido",
+  "Windows 4625 - Falha de logon",
+  "Windows 4771 - Falha Kerberos",
+  "Windows 5145 - Acesso SMB",
+  "Windows 4724 - Redefinição de senha",
+  "Windows 4728 - Membro adicionado a grupo",
+  "Windows 4735 - Grupo alterado",
+  "Windows 4738 - Conta de usuário alterada",
+  "Windows 5038 - Falha de integridade",
+  "Windows 1511 - Perfil temporário",
+  "IIS 401 - Não autorizado",
+  "Linux Auditd - Execução de processo",
+  "Linux Auditd - Base64",
+  "Linux Auditd - Comando who",
+  "VMware - Utilização de interface",
+  "Trend Vision One - Arquivo via SMB",
+  "Trend Vision One - SELinux desabilitado"
 ] as const;
+
+export const GENERATION_PROFILES = [
+  "Rotina SOC N1",
+  "Autenticação Windows",
+  "Perímetro Fortinet",
+  "Servidores Linux",
+  "Aplicações Web",
+  "Genérico"
+] as const;
+
+export const REALISM_LEVELS = ["operacional", "laboratório", "simplificado"] as const;
 
 export const SEVERITIES = ["informational", "low", "medium", "high", "critical"] as const;
 

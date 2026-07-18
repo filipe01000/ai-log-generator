@@ -26,9 +26,13 @@ Gerar datasets de logs sintéticos para treinamento e engenharia de detecção s
 
 ![Logs Raw Parser AI](docs/screenshots/ai-log-v4-logs-raw-parser-ai.png)
 
-### Configurações
+### Investigation Mode
 
-![Settings](docs/screenshots/ai-log-v4-settings.png)
+![Investigation Mode](docs/screenshots/ai-log-v2-investigation-mode.png)
+
+### Detection Engineering Lab
+
+![Detection Engineering Lab](docs/screenshots/ai-log-v2-detection-engineering-lab.png)
 
 ### Configurações
 
@@ -85,10 +89,65 @@ Gerar datasets de logs sintéticos para treinamento e engenharia de detecção s
 - Página MITRE ATT&CK
 - Settings com status dos providers de IA
 
+### Perfil Rotina SOC N1
+
+O gerador inclui um perfil operacional baseado em padrões recorrentes de triagem defensiva. Todos os identificadores são sintéticos e não reutilizam clientes, usuários, IPs, hosts, UUIDs ou domínios reais.
+
+- FortiGate: traffic forward, App Control, IPS e alteração de configuração
+- FortiWeb: tráfego HTTPS com método, URL, user agent e código HTTP
+- Windows Security e Active Directory: eventos 4624, 4625, 4771, 5145, 4724, 4728, 4735, 4738, 5038 e 1511
+- Microsoft IIS: falha HTTP 401 com substatus e código Win32
+- Linux Auditd: execve genérico, `who` executado por monitoramento e uso de `base64`
+- Trend Vision One: arquivo incomum via SMB e desativação de SELinux
+- VMware: utilização de interface, volume, descarte e taxa de tráfego
+
+Selecione `Rotina SOC N1 - Mix diário` para gerar um lote heterogêneo. O perfil escolhido restringe o mix para autenticação Windows, perímetro Fortinet, servidores Linux ou aplicações web. A fidelidade `operacional` mantém a estrutura detalhada dos raws; `simplificado` gera linhas normalizadas para exercícios básicos de parsing.
+
+### Investigation Mode
+
+O modo de investigação transforma os logs em um exercício avaliado de SOC:
+
+- Ground Truth oculto e armazenado no servidor
+- Timeline correlacionada entre Windows Security, FortiGate, Sysmon, Trend Vision One e Linux Auditd
+- Níveis iniciante, intermediário e avançado com diferentes volumes de ruído
+- Pesquisa e parser disponíveis durante a investigação
+- Relatório com classificação, severidade, MITRE, escopo, evidências, resposta e confiança
+- Score de 0 a 100 com detalhamento por critério
+- Revelação fundamentada do gabarito após o envio
+
+O primeiro caso simula abuso de credencial e possível movimentação lateral. A aprovação exige pelo menos 70 pontos.
+
+### Detection Engineering Lab
+
+A versão 2.0 transforma o projeto em um laboratório integrado de engenharia de detecção:
+
+- CMDB sintética com função, sistema operacional, criticidade, owner, exposição, coletor e status
+- Baseline por usuário, ativo e atividade operacional
+- Fontes de dados ativáveis para simular cobertura parcial
+- Perda e duplicação de eventos
+- Clock skew configurável
+- Corrupção de campos para simular falhas de parsing
+- Noise Lab de 0% a 90%
+- OCSF e OpenTelemetry LogRecord
+- Regras Sigma e Sigma Correlation
+- Consultas KQL, SPL, FortiSIEM e formato genérico
+- Validação contra Ground Truth com TP, FP, FN, TN, precision, recall, F1 e latência
+- Recomendação automática de tuning baseada no resultado
+- Detection Coverage Gap por fonte e data component
+- Parser Challenge com avaliação de 0 a 100
+- Incident Report Copilot baseado na evidência do dataset
+- Mapeamento seguro para Atomic Red Team
+
+O módulo está disponível em `/detection-lab`. A execução do Atomic Red Team não é disparada automaticamente; o sistema fornece a técnica, o plano, a telemetria esperada e o objetivo de validação para uso controlado em laboratório autorizado.
+
 ## Fabricantes e sistemas suportados no MVP
 
 - FortiGate
 - FortiSIEM
+- FortiWeb
+- Trend Vision One
+- Microsoft IIS
+- VMware
 - Wazuh
 - Sysmon
 - Windows Security
@@ -133,6 +192,8 @@ Inclui logon, logoff, falha de autenticação, movimentação lateral, RDP, Powe
   /exports
   /settings
   /logs
+  /investigation
+  /detection-lab
   /api
     /generate
     /export

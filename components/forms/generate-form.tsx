@@ -4,7 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Download, Loader2, PlayCircle } from "lucide-react";
-import { EVENT_TYPES, EXPORT_FORMATS, MANUFACTURERS, SEVERITIES, SIMULATION_MODES } from "@/lib/constants";
+import { EVENT_TYPES, EXPORT_FORMATS, GENERATION_PROFILES, MANUFACTURERS, REALISM_LEVELS, SEVERITIES, SIMULATION_MODES } from "@/lib/constants";
 import { generateSchema, type GenerateInput } from "@/lib/validators";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,12 +37,14 @@ export function GenerateForm() {
     resolver: zodResolver(generateSchema),
     defaultValues: {
       vendor: "FortiGate",
-      eventType: "Brute Force",
+      eventType: "Rotina SOC N1 - Mix diário",
       count: 50,
       severity: "high",
       noiseLevel: 25,
       simulationMode: "SOC",
       outputFormat: "json",
+      generationProfile: "Rotina SOC N1",
+      realismLevel: "operacional",
       useAI: false
     }
   });
@@ -93,6 +95,15 @@ export function GenerateForm() {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
+              <Label>Perfil de geração</Label>
+              <Select {...form.register("generationProfile")}>
+                {GENERATION_PROFILES.map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label>Fabricante / sistema</Label>
               <Select {...form.register("vendor")}>
                 {MANUFACTURERS.map((item) => (
@@ -119,6 +130,16 @@ export function GenerateForm() {
                 <Label>Ruído benigno %</Label>
                 <Input type="number" min={0} max={100} {...form.register("noiseLevel")} />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Fidelidade do raw log</Label>
+              <Select {...form.register("realismLevel")}>
+                {REALISM_LEVELS.map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </Select>
+              <p className="text-xs text-muted-foreground">Operacional reproduz campos e estrutura próximos aos logs analisados no SOC.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

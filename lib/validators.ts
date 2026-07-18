@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COMPANY_TYPES, EVENT_TYPES, EXPORT_FORMATS, MANUFACTURERS, SEVERITIES, SIMULATION_MODES } from "@/lib/constants";
+import { COMPANY_TYPES, EVENT_TYPES, EXPORT_FORMATS, GENERATION_PROFILES, MANUFACTURERS, REALISM_LEVELS, SEVERITIES, SIMULATION_MODES } from "@/lib/constants";
 
 export const generateSchema = z.object({
   vendor: z.enum(MANUFACTURERS),
@@ -9,6 +9,8 @@ export const generateSchema = z.object({
   noiseLevel: z.coerce.number().int().min(0).max(100).default(25),
   simulationMode: z.enum(SIMULATION_MODES).optional(),
   outputFormat: z.enum(EXPORT_FORMATS).default("json"),
+  generationProfile: z.enum(GENERATION_PROFILES).default("Rotina SOC N1"),
+  realismLevel: z.enum(REALISM_LEVELS).default("operacional"),
   useAI: z.coerce.boolean().optional().default(false)
 });
 
@@ -82,8 +84,47 @@ export const aiAnalysisSchema = z.object({
   })).min(1).max(20)
 });
 
+export const investigationStartSchema = z.object({
+  difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("intermediate")
+});
+
+export const investigationSubmitSchema = z.object({
+  caseId: z.string().min(1),
+  classification: z.enum(["true_positive", "false_positive", "inconclusive"]),
+  severity: z.enum(SEVERITIES),
+  mitreId: z.string().trim().min(1).max(30),
+  affectedUser: z.string().trim().min(1).max(200),
+  affectedHosts: z.string().trim().min(1).max(1000),
+  evidence: z.string().trim().min(20).max(5000),
+  recommendedAction: z.string().trim().min(20).max(5000),
+  confidence: z.coerce.number().int().min(0).max(100)
+});
+
+export const detectionLabStartSchema = z.object({
+  difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("intermediate"),
+  noiseLevel: z.coerce.number().int().min(0).max(90).default(45),
+  dropRate: z.coerce.number().int().min(0).max(40).default(5),
+  duplicateRate: z.coerce.number().int().min(0).max(30).default(3),
+  clockSkewSeconds: z.coerce.number().int().min(0).max(600).default(30),
+  parserCorruptionRate: z.coerce.number().int().min(0).max(30).default(3),
+  availableSources: z.array(z.enum(MANUFACTURERS)).min(1).max(12)
+});
+
+export const detectionValidationSchema = z.object({
+  runId: z.string().min(1),
+  threshold: z.coerce.number().int().min(2).max(100),
+  timespanMinutes: z.coerce.number().int().min(1).max(120)
+});
+
+export const parserChallengeSchema = z.object({
+  runId: z.string().min(1),
+  mappings: z.record(z.string(), z.string())
+});
+
 export type GenerateInput = z.infer<typeof generateSchema>;
 export type AiScenarioInput = z.infer<typeof aiScenarioSchema>;
 export type ExportInput = z.infer<typeof exportSchema>;
 export type DeleteLogsInput = z.infer<typeof deleteLogsSchema>;
 export type AiAnalysisInput = z.infer<typeof aiAnalysisSchema>;
+export type InvestigationSubmitInput = z.infer<typeof investigationSubmitSchema>;
+export type DetectionLabStartInput = z.infer<typeof detectionLabStartSchema>;

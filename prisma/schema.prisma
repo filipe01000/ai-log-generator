@@ -126,3 +126,36 @@ model Setting {
 
   @@map("settings")
 }
+
+model InvestigationCase {
+  id              String    @id @default(cuid())
+  title           String
+  difficulty      String
+  status          String    @default("open")
+  briefing        String
+  logsJson        String
+  groundTruthJson String
+  resultJson      String?
+  score           Int?
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  @@index([status])
+  @@index([difficulty])
+  @@map("investigation_cases")
+}
+
+model DetectionLabRun {
+  id          String    @id @default(cuid())
+  name        String
+  status      String    @default("active")
+  configJson  String
+  datasetJson String
+  truthJson   String
+  resultJson  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@map("detection_lab_runs")
+}

@@ -1,6 +1,6 @@
 {
   "name": "ai-log-generator",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "private": true,
   "description": "Plataforma web para geração de logs realistas com IA para SOC, Blue Team, DFIR, Threat Hunting e CTFs.",
   "scripts": {

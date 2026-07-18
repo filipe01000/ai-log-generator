@@ -49,6 +49,7 @@ type Context = {
   riskScore: number;
   confidence: number;
   isBenign: boolean;
+  realismLevel: "operacional" | "laboratório" | "simplificado";
 };
 
 const USERS = ["jsantos", "mcarvalho", "rteixeira", "svc_backup", "svc_sql", "admin.ops", "faugusto", "helpdesk01", "financeiro02", "secops"];
@@ -103,8 +104,40 @@ const PORTS_BY_EVENT: Record<string, number[]> = {
   "DNS Tunneling": [53],
   "SQL Injection": [80, 443],
   XSS: [80, 443],
-  "Directory Traversal": [80, 443]
+  "Directory Traversal": [80, 443],
+  "FortiGate Traffic Forward": [13000, 161, 443],
+  "FortiGate App Control": [443],
+  "FortiGate IPS": [80, 443],
+  "FortiWeb HTTPS": [443],
+  "Windows 5145 - Acesso SMB": [445],
+  "IIS 401 - Não autorizado": [443]
 };
+
+const SOC_DAILY_MIX = [
+  { vendor: "FortiGate", eventType: "FortiGate Traffic Forward" },
+  { vendor: "FortiGate", eventType: "FortiGate Traffic Forward" },
+  { vendor: "FortiGate", eventType: "FortiGate App Control" },
+  { vendor: "FortiGate", eventType: "FortiGate IPS" },
+  { vendor: "FortiGate", eventType: "FortiGate Config Change" },
+  { vendor: "FortiWeb", eventType: "FortiWeb HTTPS" },
+  { vendor: "Windows Security", eventType: "Windows 4624 - Logon bem-sucedido" },
+  { vendor: "Windows Security", eventType: "Windows 4625 - Falha de logon" },
+  { vendor: "Active Directory", eventType: "Windows 4771 - Falha Kerberos" },
+  { vendor: "Windows Security", eventType: "Windows 5145 - Acesso SMB" },
+  { vendor: "Active Directory", eventType: "Windows 4724 - Redefinição de senha" },
+  { vendor: "Active Directory", eventType: "Windows 4728 - Membro adicionado a grupo" },
+  { vendor: "Active Directory", eventType: "Windows 4735 - Grupo alterado" },
+  { vendor: "Active Directory", eventType: "Windows 4738 - Conta de usuário alterada" },
+  { vendor: "Windows Security", eventType: "Windows 5038 - Falha de integridade" },
+  { vendor: "Windows Security", eventType: "Windows 1511 - Perfil temporário" },
+  { vendor: "Microsoft IIS", eventType: "IIS 401 - Não autorizado" },
+  { vendor: "Linux Auditd", eventType: "Linux Auditd - Execução de processo" },
+  { vendor: "Linux Auditd", eventType: "Linux Auditd - Comando who" },
+  { vendor: "Linux Auditd", eventType: "Linux Auditd - Base64" },
+  { vendor: "VMware", eventType: "VMware - Utilização de interface" },
+  { vendor: "Trend Vision One", eventType: "Trend Vision One - Arquivo via SMB" },
+  { vendor: "Trend Vision One", eventType: "Trend Vision One - SELinux desabilitado" }
+] as const;
 
 function privateIp() {
   const ranges = [
@@ -173,6 +206,7 @@ function buildContext(input: {
   timestamp?: Date;
   forcedMitreId?: string;
   isBenign?: boolean;
+  realismLevel?: "operacional" | "laboratório" | "simplificado";
 }): Context {
   const technique = getTechniqueById(input.forcedMitreId) || findTechniqueForEvent(input.eventType);
   const isBenign = Boolean(input.isBenign);
@@ -208,7 +242,8 @@ function buildContext(input: {
     mitre: technique,
     riskScore,
     confidence: isBenign ? Number((Math.random() * 0.3 + 0.45).toFixed(2)) : Number((technique.confidence + Math.random() * 0.1 - 0.05).toFixed(2)),
-    isBenign
+    isBenign,
+    realismLevel: input.realismLevel || "operacional"
   };
 }
 
@@ -256,16 +291,49 @@ function syslogPrefix(ctx: Context) {
 }
 
 function buildFortinet(ctx: Context) {
+  if (ctx.eventType === "FortiGate Traffic Forward") {
+    const action = pick(["close", "accept", "client-rst", "server-rst", "timeout"]);
+    const proto = ctx.port === 161 || ctx.port === 53 ? 17 : 6;
+    return `<189>date=${ctx.timestamp.toISOString().slice(0, 10)} time=${ctx.timestamp.toISOString().slice(11, 19)} devname="FGT-LAB-01" devid="FGVM-AILOG-0001" eventtime=${ctx.timestamp.getTime() * 1_000_000} tz="-0300" logid="0000000013" type="traffic" subtype="forward" level="notice" vd="root" srcip=${ctx.srcIp} srcname="${ctx.hostname}" srcport=${randomInt(49152, 65535)} srcintf="VLAN_${randomInt(10, 120)}" srcintfrole="lan" dstip=${ctx.dstIp} dstport=${ctx.port} dstintf="VLAN_${randomInt(10, 120)}" dstintfrole="lan" sessionid=${randomInt(1000000000, 2147483647)} proto=${proto} action="${action}" policyid=${randomInt(20, 350)} policytype="policy" poluuid="${ctx.id}" policyname="LAB-SERVICE-POLICY" user="${ctx.username}" service="${ctx.port === 161 ? "SNMP" : ctx.port === 443 ? "HTTPS" : "TCP-PORT"}" trandisp="noop" duration=${randomInt(1, 120)} sentbyte=${randomInt(64, 80000)} rcvdbyte=${action === "timeout" ? 0 : randomInt(0, 90000)} sentpkt=${randomInt(1, 120)} rcvdpkt=${action === "timeout" ? 0 : randomInt(0, 120)}`;
+  }
+  if (ctx.eventType === "FortiGate App Control") {
+    return `<190>date=${ctx.timestamp.toISOString().slice(0, 10)} time=${ctx.timestamp.toISOString().slice(11, 19)} devname="FGT-LAB-01" devid="FGVM-AILOG-0001" eventtime=${ctx.timestamp.getTime() * 1_000_000} tz="-0300" logid="1059028704" type="utm" subtype="app-ctrl" eventtype="signature" level="information" vd="root" appid=34039 user="${ctx.username}" srcip=${ctx.srcIp} dstip=${ctx.dstIp} srcport=${randomInt(49152, 65535)} dstport=443 srcintf="VLAN_${randomInt(10, 120)}" dstintf="WAN" proto=6 service="HTTPS" direction="outgoing" policyid=${randomInt(20, 100)} sessionid=${randomInt(1000000000, 2147483647)} applist="APP_PROFILE_LAB" action="pass" appcat="Web.Client" app="HTTP.BROWSER_CHROME" hostname="${ctx.domain}" incidentserialno=${randomInt(100000, 999999)} msg="Application control detected: HTTP.BROWSER_CHROME"`;
+  }
+  if (ctx.eventType === "FortiGate Config Change") {
+    return `<190>date=${ctx.timestamp.toISOString().slice(0, 10)} time=${ctx.timestamp.toISOString().slice(11, 19)} devname="FGT-LAB-01" devid="FGVM-AILOG-0001" eventtime=${ctx.timestamp.getTime() * 1_000_000} tz="-0300" logid="0100044547" type="event" subtype="system" level="information" vd="root" logdesc="Object attribute configured" user="${ctx.username}" ui="https" action="Edit" cfgtid=${randomInt(10000000, 99999999)} uuid="${ctx.id}" cfgpath="firewall.addrgrp" cfgobj="LAB_ADDRESS_GROUP" cfgattr="member updated" msg="Edit firewall.addrgrp LAB_ADDRESS_GROUP"`;
+  }
   return `${syslogPrefix(ctx)} devname="FGT-AILOG-01" devid="FGVMMLAB0001" eventtime=${ctx.timestamp.getTime() * 1_000_000} tz="-0300" logid="0419016384" type="utm" subtype="ips" level="${ctx.severity}" vd="root" srcip=${ctx.srcIp} srcport=${randomInt(1024, 65000)} srcintf="wan1" dstip=${ctx.dstIp} dstport=${ctx.port} dstintf="LAN" proto=${ctx.proto === "TCP" ? 6 : 17} action="${ctx.action}" policyid=${randomInt(1, 50)} attack="${ctx.eventType}" severity="${ctx.severity}" user="${ctx.username}" hostname="${ctx.hostname}" mitreid="${ctx.mitre.id}" msg="Synthetic ${ctx.eventType} detected for SOC training"`;
 }
 
 function buildWindows(ctx: Context) {
-  const eventId = ctx.eventType === "Falha de autenticação" ? 4625 : ctx.eventType === "Logon" ? 4624 : ctx.eventType === "Alteração de grupos" ? 4732 : ctx.eventType === "Criação de usuários" ? 4720 : ctx.vendor === "Sysmon" ? 1 : 4688;
-  return `${ctx.timestamp.toISOString()} ${ctx.hostname} ${ctx.vendor} EventID=${eventId} Level=${ctx.severity} AccountName=${ctx.username} SourceAddress=${ctx.srcIp} Workstation=${ctx.destinationHost} ProcessName=${ctx.process} CommandLine="${ctx.command}" Hashes=SHA256=${ctx.hash} MITRE=${ctx.mitre.id} Message="Synthetic ${ctx.eventType} event generated for detection engineering"`;
+  const explicitId = ctx.eventType.match(/Windows (\d{4})/)?.[1];
+  const eventId = explicitId ? Number(explicitId) : ctx.eventType === "Falha de autenticação" ? 4625 : ctx.eventType === "Logon" ? 4624 : ctx.eventType === "Alteração de grupos" ? 4732 : ctx.eventType === "Criação de usuários" ? 4720 : ctx.vendor === "Sysmon" ? 1 : 4688;
+  const status = eventId === 4625 ? "0xC000006D" : eventId === 4771 ? "0x18" : "0x0";
+  const logonType = pick([2, 3, 5, 7, 10]);
+  return `${ctx.timestamp.toISOString()} ${ctx.hostname}.${ctx.domain} ${ctx.dstIp} FSM-WUA-WinLog-${eventId === 1511 ? "Application" : "Security"} [customer]="Synthetic SOC Lab" [monitorStatus]="Success" [Locale]="pt-BR" [timeZone]="-0300" [level]="${eventId === 1511 || eventId === 5038 ? "Error" : "Information"}" [xml]=<Event><System><Provider Name="Microsoft-Windows-Security-Auditing"/><EventID>${eventId}</EventID><TimeCreated SystemTime="${ctx.timestamp.toISOString()}"/></System><EventData><Data Name="TargetUserName">${ctx.username}</Data><Data Name="TargetDomainName">${ctx.domain.split(".")[0].toUpperCase()}</Data><Data Name="LogonType">${logonType}</Data><Data Name="IpAddress">${ctx.srcIp}</Data><Data Name="IpPort">${randomInt(49152, 65535)}</Data><Data Name="WorkstationName">${ctx.destinationHost}</Data><Data Name="Status">${status}</Data><Data Name="ProcessName">${ctx.process}</Data><Data Name="ShareName">\\\\*\\IPC$</Data><Data Name="RelativeTargetName">${eventId === 5145 ? "srvsvc" : "-"}</Data></EventData></Event>`;
 }
 
 function buildLinux(ctx: Context) {
-  return `type=SYSCALL msg=audit(${Math.floor(ctx.timestamp.getTime() / 1000)}.${randomInt(100, 999)}:${randomInt(1000, 9999)}): arch=c000003e syscall=59 success=yes exe="/bin/bash" auid=1000 uid=33 user="${ctx.username}" hostname="${ctx.hostname}" src=${ctx.srcIp} dst=${ctx.dstIp} command="${ctx.command}" mitre="${ctx.mitre.id}" severity="${ctx.severity}"`;
+  const command = ctx.eventType.includes("Base64") ? "base64" : ctx.eventType.includes("who") ? "who" : pick(["who", "kmod", "curl", "bash"]);
+  const uid = command === "who" ? 984 : command === "base64" ? 42 : 0;
+  return `<182>${ctx.timestamp.toUTCString().slice(5, 22)} ${ctx.hostname} audispd: type=SYSCALL msg=audit(${Math.floor(ctx.timestamp.getTime() / 1000)}.${randomInt(100, 999)}:${randomInt(1000, 9999999)}): arch=c000003e syscall=59 success=yes exit=0 a0=${ctx.hash.slice(0, 12)} a1=${ctx.hash.slice(12, 24)} items=2 ppid=${randomInt(1000, 4000000)} pid=${randomInt(1000, 4000000)} auid=4294967295 uid=${uid} gid=${uid} euid=${uid} tty=(none) ses=4294967295 comm="${command}" exe="/usr/bin/${command}" subj=unconfined key="LINUX_PROCESS_EXEC" ARCH=x86_64 SYSCALL=execve AUID="unset" UID="${command === "who" ? "zabbix" : command === "base64" ? "_apt" : "root"}"`;
+}
+
+function buildFortiWeb(ctx: Context) {
+  return `<189>date=${ctx.timestamp.toISOString().slice(0, 10)} time=${ctx.timestamp.toISOString().slice(11, 19)} log_id=30001000 msg_id=${String(randomInt(1, 999999999999)).padStart(12, "0")} device_id=FVVM-AILOG-01 eventtime=${ctx.timestamp.getTime() * 1_000_000} vd="root" timezone="(GMT-3:00)Brasilia" type=traffic subtype=https pri=notice proto=tcp service=https/tls1.3 status=success reason=none policy="LAB_IIS_POLICY" original_src=${ctx.srcIp} src=${ctx.srcIp} src_port=${randomInt(1024, 65535)} dst=${ctx.dstIp} dst_port=443 http_request_time=${randomInt(0, 50)} http_response_time=${randomInt(0, 200)} http_request_bytes=${randomInt(200, 1800)} http_response_bytes=${randomInt(100, 5000)} http_method=${pick(["get", "post"])} http_url="/${pick(["api/health", "login", "xmlrpc.php", "wp-login.php"])}" http_agent="${ctx.userAgent}" http_retcode=${pick([200, 401, 403, 404, 405])} msg="Synthetic HTTPS request from ${ctx.srcIp}"`;
+}
+
+function buildIis(ctx: Context) {
+  return `${ctx.timestamp.toISOString()} ${ctx.hostname}.${ctx.domain} ${ctx.dstIp} AccelOps-WUA-IIS [customer]="Synthetic SOC Lab" [monitorStatus]="Success" [timeZone]="-0300" [date]="${ctx.timestamp.toISOString().slice(0, 10)}" [time]="${ctx.timestamp.toISOString().slice(11, 19)}" [s-ip]="${ctx.dstIp}" [cs-method]="POST" [cs-uri-stem]="/api/v1/requests/pending" [s-port]="443" [cs-username]="-" [c-ip]="${ctx.srcIp}" [cs(User-Agent)]="${ctx.userAgent}" [sc-status]="401" [sc-substatus]="2" [sc-win32-status]="5" [time-taken]="${randomInt(10, 900)}"`;
+}
+
+function buildTrend(ctx: Context) {
+  const selinux = ctx.eventType.includes("SELinux");
+  return JSON.stringify({eventTime: ctx.timestamp.toISOString(), product: "Trend Vision One", model: selinux ? "Suspicious Activity Evidence" : "Workbench", alertName: selinux ? "SELinux was disabled to allow malicious processes to run" : "Uncommon file dropped in noteworthy folder via SMB", severity: selinux ? "high" : ctx.severity, endpoint: ctx.hostname, endpointIp: ctx.srcIp, user: selinux ? "root" : "NT AUTHORITY\\SYSTEM", processName: selinux ? "setenforce" : "System", destinationHost: ctx.destinationHost, uuid: ctx.id, riskScore: ctx.riskScore, synthetic: true});
+}
+
+function buildVmware(ctx: Context) {
+  return `<134>${ctx.timestamp.toUTCString().slice(5, 22)} ${ctx.srcIp} java: [PH_DEV_MON_NET_INTF_UTIL]:[eventSeverity]=PHL_INFO,[hostName]=${ctx.hostname}.${ctx.domain},[hostIpAddr]=${ctx.srcIp},[pollIntv]=180,[folder]=root,[intfName]=vmnic1,[totBitsPerSec]=${randomInt(1000000, 1000000000)},[sentBytes64]=${randomInt(1000000, 9000000000)},[outIntfUtil]=${(Math.random() * 80).toFixed(3)},[recvBytes64]=${randomInt(1000000, 9000000000)},[inIntfUtil]=${(Math.random() * 80).toFixed(3)},[outIntfPktDiscarded]=0,[inIntfPktDiscarded]=0,[extEventRecvProto]=VM_SDK`;
 }
 
 function buildWeb(ctx: Context) {
@@ -325,7 +393,14 @@ function buildDatabase(ctx: Context) {
 }
 
 function buildRaw(ctx: Context) {
+  if (ctx.realismLevel === "simplificado") {
+    return `${ctx.timestamp.toISOString()} vendor="${ctx.vendor}" event="${ctx.eventType}" severity=${ctx.severity} action=${ctx.action} src=${ctx.srcIp} dst=${ctx.dstIp} dport=${ctx.port} user=${ctx.username} host=${ctx.hostname} synthetic=true`;
+  }
   if (ctx.vendor === "FortiGate" || ctx.vendor === "FortiSIEM") return buildFortinet(ctx);
+  if (ctx.vendor === "FortiWeb") return buildFortiWeb(ctx);
+  if (ctx.vendor === "Microsoft IIS") return buildIis(ctx);
+  if (ctx.vendor === "Trend Vision One") return buildTrend(ctx);
+  if (ctx.vendor === "VMware") return buildVmware(ctx);
   if (isWindowsVendor(ctx.vendor)) return buildWindows(ctx);
   if (ctx.vendor === "Linux Auditd" || ctx.vendor === "SSH") return buildLinux(ctx);
   if (["Apache", "Nginx"].includes(ctx.vendor)) return buildWeb(ctx);
@@ -343,6 +418,7 @@ export function generateOne(input: {
   forcedMitreId?: string;
   scenarioId?: string;
   isBenign?: boolean;
+  realismLevel?: "operacional" | "laboratório" | "simplificado";
 }): GeneratedLogRecord {
   const ctx = buildContext(input);
   const payload = basePayload(ctx);
@@ -376,19 +452,32 @@ export function generateLogBatch(input: GenerateInput & { scenarioId?: string })
   const safeCount = clamp(input.count, 1, 5000);
   const benignRate = input.noiseLevel / 100;
 
+  const profileEvents = input.generationProfile === "Autenticação Windows"
+      ? SOC_DAILY_MIX.filter((item) => item.eventType.startsWith("Windows "))
+      : input.generationProfile === "Perímetro Fortinet"
+        ? SOC_DAILY_MIX.filter((item) => item.vendor === "FortiGate" || item.vendor === "FortiWeb")
+        : input.generationProfile === "Servidores Linux"
+          ? SOC_DAILY_MIX.filter((item) => item.vendor === "Linux Auditd" || item.vendor === "Trend Vision One")
+          : input.generationProfile === "Aplicações Web"
+            ? SOC_DAILY_MIX.filter((item) => item.vendor === "Microsoft IIS" || item.vendor === "FortiWeb")
+            : SOC_DAILY_MIX;
+
   for (let i = 0; i < safeCount; i++) {
     const isBenign = Math.random() < benignRate;
-    const eventType = isBenign ? pick(["Logon", "Logoff", "HTTP", "DNS", "DHCP", "HTTPS"] as const) : input.eventType;
+    const daily = input.eventType === "Rotina SOC N1 - Mix diário" ? pick(profileEvents) : null;
+    const vendor = daily?.vendor || input.vendor;
+    const eventType = daily?.eventType || (isBenign ? pick(["Logon", "Logoff", "HTTP", "DNS", "DHCP", "HTTPS"] as const) : input.eventType);
     const timestamp = new Date(Date.now() - (safeCount - i) * randomInt(500, 3500));
     logs.push(
       generateOne({
-        vendor: input.vendor,
+        vendor,
         eventType,
         severity: input.severity,
         timestamp,
-        forcedMitreId: technique.id,
+        forcedMitreId: daily ? undefined : technique.id,
         scenarioId: input.scenarioId,
-        isBenign
+        isBenign,
+        realismLevel: input.realismLevel
       })
     );
   }
