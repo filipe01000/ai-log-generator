@@ -129,7 +129,7 @@ export function AiLogAnalysis({ logs }: { logs: AnalysisLog[] }) {
             <div className="flex items-center justify-between"><span className="text-muted-foreground">Evento</span><span>{selected.eventType}</span></div>
             <div className="flex items-center justify-between"><span className="text-muted-foreground">Severidade</span><Badge variant={selected.severity as never}>{selected.severity}</Badge></div>
             <div className="flex items-center justify-between"><span className="text-muted-foreground">MITRE</span><span>{selected.mitreId || "benigno"}</span></div>
-            <pre className="max-h-56 overflow-auto rounded-lg bg-black/60 p-3 text-xs text-emerald-100">{selected.raw}</pre>
+            <pre className="max-h-56 overflow-auto rounded-lg bg-black/60 p-3 text-xs text-brand-100">{selected.raw}</pre>
           </CardContent>
         </Card>
       </div>
@@ -153,7 +153,7 @@ export function AiLogAnalysis({ logs }: { logs: AnalysisLog[] }) {
               <p className="text-sm leading-6 text-foreground">{result.summary}</p>
               <div>
                 <h4 className="mb-2 text-sm font-semibold text-foreground">Lógica de detecção sugerida</h4>
-                <pre className="overflow-auto rounded-lg bg-black/60 p-3 text-xs text-cyan-700 dark:text-cyan-100">{result.detectionLogic}</pre>
+                <pre className="overflow-auto rounded-lg bg-black/60 p-3 text-xs text-brand-700 dark:text-brand-100">{result.detectionLogic}</pre>
               </div>
             </CardContent>
           </Card>
@@ -161,7 +161,7 @@ export function AiLogAnalysis({ logs }: { logs: AnalysisLog[] }) {
           <Card>
             <CardHeader><CardTitle>Normalização</CardTitle></CardHeader>
             <CardContent>
-              <pre className="max-h-80 overflow-auto rounded-lg bg-black/60 p-3 text-xs text-emerald-100">{JSON.stringify(result.normalizedEvent, null, 2)}</pre>
+              <pre className="max-h-80 overflow-auto rounded-lg bg-black/60 p-3 text-xs text-brand-100">{JSON.stringify(result.normalizedEvent, null, 2)}</pre>
             </CardContent>
           </Card>
 

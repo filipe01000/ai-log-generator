@@ -407,9 +407,21 @@ npx prisma migrate dev
 npm run dev
 ```
 
+## Segurança
+
+- A aplicação não tem login. Rode em `localhost` ou em uma rede de laboratório. Se publicar, coloque autenticação à frente, porque qualquer visitante pode gerar, exportar e apagar logs.
+- O rate limit fica na memória do processo: reinicia com o servidor e não é compartilhado entre instâncias.
+- Atrás de um proxy reverso, defina `TRUSTED_PROXY_HOPS` com o número de proxies. Sem isso, o limite vale para todos os clientes juntos, porque o cabeçalho `X-Forwarded-For` pode ser falsificado.
+
+## Testes
+
+```bash
+npm test
+```
+
 ## Licença
 
-Projeto educacional para laboratório, portfólio e treinamento de segurança.
+Distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE). Projeto educacional para laboratório, portfólio e treinamento de segurança.
 
 ## Melhorias adicionadas na tela de Logs
 

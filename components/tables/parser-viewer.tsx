@@ -141,7 +141,7 @@ export function ParserViewer({ logs }: { logs: ParserLog[] }) {
               <TableBody>
                 {rawEntries.map(([key, value]) => (
                   <TableRow key={key}>
-                    <TableCell className="font-mono text-xs text-cyan-700 dark:text-cyan-100">{key}</TableCell>
+                    <TableCell className="font-mono text-xs text-brand-700 dark:text-brand-100">{key}</TableCell>
                     <TableCell className="break-all font-mono text-xs">{value}</TableCell>
                   </TableRow>
                 ))}

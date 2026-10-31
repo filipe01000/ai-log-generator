@@ -121,8 +121,8 @@ export function InvestigationLab() {
   if (!caseData) {
     return (
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card className="border-emerald-500/25 bg-emerald-500/5">
-          <CardHeader><CardTitle className="flex items-center gap-2"><FileSearch className="h-5 w-5 text-emerald-500" /> Como funciona</CardTitle></CardHeader>
+        <Card className="border-brand-500/25 bg-brand-500/5">
+          <CardHeader><CardTitle className="flex items-center gap-2"><FileSearch className="h-5 w-5 text-brand-500" /> Como funciona</CardTitle></CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>Você receberá logs correlacionados de Windows, FortiGate, Sysmon, Trend Vision One e Linux. Alguns eventos são evidências do incidente; outros são ruído benigno.</p>
             <p>O Ground Truth permanece oculto no servidor até o envio da análise. A nota considera classificação, severidade, MITRE, escopo, evidências, resposta e calibração da confiança.</p>

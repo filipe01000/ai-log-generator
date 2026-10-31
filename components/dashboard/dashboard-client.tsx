@@ -75,7 +75,7 @@ export function DashboardClient() {
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{metric.label}</p>
                   <p className="mt-2 text-2xl font-bold text-foreground">{metric.value}</p>
                 </div>
-                <div className="rounded-lg bg-emerald-400/10 p-3 text-emerald-300">
+                <div className="rounded-lg bg-brand-400/10 p-3 text-brand-700 dark:text-brand-300">
                   <Icon className="h-5 w-5" />
                 </div>
               </CardContent>
@@ -116,7 +116,7 @@ export function DashboardClient() {
                   <Badge variant="outline">{item.id}</Badge>
                   <p className="mt-2 text-sm text-foreground">{item.technique}</p>
                 </div>
-                <p className="text-xl font-bold text-emerald-300">{item.count}</p>
+                <p className="text-xl font-bold text-brand-700 dark:text-brand-300">{item.count}</p>
               </div>
             ))}
           </CardContent>

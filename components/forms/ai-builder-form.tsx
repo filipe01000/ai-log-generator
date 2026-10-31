@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { BrainCircuit, Loader2 } from "lucide-react";
 import { COMPANY_TYPES, EVENT_TYPES, EXPORT_FORMATS, MANUFACTURERS, SEVERITIES } from "@/lib/constants";
-import { aiScenarioSchema, type AiScenarioInput } from "@/lib/validators";
+import { aiScenarioSchema, type AiScenarioFormInput, type AiScenarioInput } from "@/lib/validators";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +33,7 @@ export function AiBuilderForm() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<AiScenarioInput>({
+  const form = useForm<AiScenarioFormInput, unknown, AiScenarioInput>({
     resolver: zodResolver(aiScenarioSchema),
     defaultValues: {
       companyType: "Empresa média",
@@ -147,7 +147,7 @@ export function AiBuilderForm() {
                     key={vendor}
                     type="button"
                     onClick={() => toggleVendor(vendor)}
-                    className={`rounded-lg border px-3 py-2 text-left text-xs transition ${selectedVendors.includes(vendor) ? "border-emerald-400/50 bg-emerald-400/10 text-emerald-200" : "border-border bg-card text-muted-foreground hover:bg-secondary/60 hover:text-foreground"}`}
+                    className={`rounded-lg border px-3 py-2 text-left text-xs transition ${selectedVendors.includes(vendor) ? "border-brand-400/50 bg-brand-400/10 text-brand-700 dark:text-brand-200" : "border-border bg-card text-muted-foreground hover:bg-secondary/60 hover:text-foreground"}`}
                   >
                     {vendor}
                   </button>
@@ -199,7 +199,7 @@ export function AiBuilderForm() {
                     {result.scenario.iocs.map((ioc) => (
                       <div key={`${ioc.type}-${ioc.value}`} className="rounded-lg bg-secondary/40 p-2">
                         <Badge variant="secondary">{ioc.type}</Badge>
-                        <p className="mt-1 break-all font-mono text-xs text-emerald-100">{ioc.value}</p>
+                        <p className="mt-1 break-all font-mono text-xs text-brand-700 dark:text-brand-100">{ioc.value}</p>
                         <p className="text-xs text-muted-foreground">confidence {ioc.confidence}</p>
                       </div>
                     ))}

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Download, Loader2, PlayCircle } from "lucide-react";
 import { EVENT_TYPES, EXPORT_FORMATS, GENERATION_PROFILES, MANUFACTURERS, REALISM_LEVELS, SEVERITIES, SIMULATION_MODES } from "@/lib/constants";
-import { generateSchema, type GenerateInput } from "@/lib/validators";
+import { generateSchema, type GenerateFormInput, type GenerateInput } from "@/lib/validators";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ export function GenerateForm() {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<GenerateInput>({
+  const form = useForm<GenerateFormInput, unknown, GenerateInput>({
     resolver: zodResolver(generateSchema),
     defaultValues: {
       vendor: "FortiGate",

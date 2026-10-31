@@ -29,7 +29,7 @@ export function ThemeSettingsCard() {
                 key={option.value}
                 type="button"
                 onClick={() => setTheme(option.value)}
-                className={`rounded-xl border p-4 text-left transition hover:bg-secondary/60 ${active ? "border-emerald-500/50 bg-emerald-500/10 ring-1 ring-emerald-500/30" : "border-border bg-card"}`}
+                className={`rounded-xl border p-4 text-left transition hover:bg-secondary/60 ${active ? "border-brand-500/50 bg-brand-500/10 ring-1 ring-brand-500/30" : "border-border bg-card"}`}
               >
                 <div className="mb-3 flex items-center gap-2 font-semibold text-foreground">
                   <Icon className="h-4 w-4" />

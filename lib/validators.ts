@@ -14,6 +14,8 @@ export const generateSchema = z.object({
   useAI: z.coerce.boolean().optional().default(false)
 });
 
+export type GenerateFormInput = z.input<typeof generateSchema>;
+
 export const aiScenarioSchema = z.object({
   companyType: z.enum(COMPANY_TYPES),
   assetCount: z.coerce.number().int().min(1).max(10000),
@@ -27,6 +29,8 @@ export const aiScenarioSchema = z.object({
   logCount: z.coerce.number().int().min(10).max(5000).default(150),
   aiProvider: z.enum(["mock", "openai", "ollama"]).default("mock")
 });
+
+export type AiScenarioFormInput = z.input<typeof aiScenarioSchema>;
 
 export const exportSchema = z.object({
   format: z.enum(EXPORT_FORMATS),
