@@ -493,7 +493,6 @@ Payload mínimo:
 - Raw concentrado em estilo console SOC.
 - Visualização Parser para campos normalizados.
 - Aba IA para análise, ajustes de parser, severidade, evidências e resposta recomendada.
-- Documentos auxiliares em `docs/linkedin-post.md` e `docs/github-publish.md`.
 
 ## Novidades da versão 4
 
